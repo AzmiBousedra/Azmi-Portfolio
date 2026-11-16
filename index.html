@@ -145,9 +145,9 @@
             box-shadow: 0 0 15px rgba(255,255,255,0.6);
         }
 
-        #link-projects { top: 35%; left: 16.3%; }    /* middle of the laptop screen */
-        #link-github { top: 33.4%; left: 68.9%; }    /* inside the cat bed */
-        #link-resume { top: 44.3%; left: 75.5%; }    /* nightstand drawers */
+        #link-projects { top: 35%; left: 16.8%; }    /* middle of the laptop screen */
+        #link-github { top: 33.6%; left: 69.1%; }    /* inside the cat bed */
+        #link-resume { top: 44.3%; left: 76.5%; }    /* nightstand drawers */
         #link-contact { top: 83.7%; left: 72.7%; }   /* phone */
         #link-boxes { top: 75.5%; left: 89.8%; }     /* boxes, info only */
 
@@ -740,6 +740,28 @@
         .close-modal:hover {
             color: #fff;
         }
+
+        /* --- iMessage-style banner for projects not on GitHub yet --- */
+        .imsg {
+            position: fixed; top: 14px; left: 50%; z-index: 20000;
+            width: min(380px, calc(100vw - 32px));
+            display: flex; gap: 11px; align-items: flex-start;
+            padding: 11px 13px; border-radius: 18px;
+            background: rgba(246,246,246,.82); backdrop-filter: blur(24px) saturate(180%); -webkit-backdrop-filter: blur(24px) saturate(180%);
+            box-shadow: 0 10px 30px rgba(0,0,0,.25), inset 0 0 0 .5px rgba(255,255,255,.6);
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: #111; cursor: pointer;
+            transform: translate(-50%, -140%); opacity: 0;
+            transition: transform .45s cubic-bezier(.2,.9,.3,1.15), opacity .3s;
+        }
+        .imsg.show { transform: translate(-50%, 0); opacity: 1; }
+        .imsg-icon { flex: none; width: 38px; height: 38px; border-radius: 9px; display: grid; place-items: center; background: linear-gradient(#6ff07f, #22c33a); }
+        .imsg-main { flex: 1; min-width: 0; }
+        .imsg-head { display: flex; justify-content: space-between; font-size: 13px; }
+        .imsg-head b { font-weight: 600; }
+        .imsg-head span { color: #8a8a8e; font-size: 12px; }
+        .imsg-text { font-size: 13px; line-height: 1.35; margin-top: 2px; }
+        @media (prefers-reduced-motion: reduce) { .imsg { transition: opacity .2s; } }
     </style>
 </head>
 <body>
@@ -953,7 +975,7 @@
                     <a href="#" onclick="return false;" class="terminal-link" data-skills="[Train Your Driver] Swift, SwiftUI, Python, PyTorch, Reinforcement Learning" data-desc="iOS game where you evolve a neural-net F1 driver across 37 real circuits.">Train Your Driver</a><span class="term-tag new">NEW</span><br>
                     <a href="#" onclick="return false;" class="terminal-link" data-skills="[Gazey] Swift, AppKit, SwiftUI, ScreenCaptureKit, MCP, Ollama" data-desc="Press ⌥Space, type a few words, and an AI agent acts on whatever is on your screen.">Gazey</a><span class="term-tag new">NEW</span><br>
                     <a href="#" onclick="return false;" class="terminal-link" data-skills="[Queued] TypeScript, React Native, Expo, Supabase, Postgres, TanStack Query" data-desc="Rate and review music, and follow people whose taste you trust.">Queued</a><br>
-                    <a href="#" onclick="return false;" class="terminal-link" data-skills="[AfterLab] ExtendScript, JavaScript, React, GSAP, XML" data-desc="One-click actions that replace repetitive manual editing in After Effects.">AfterLab</a><span class="term-tag oss">OPEN SOURCE</span><br>
+                    <a href="https://github.com/AzmiBousedra/AfterLab" target="_blank" class="terminal-link" data-skills="[AfterLab] ExtendScript, JavaScript, React, GSAP, XML" data-desc="One-click actions that replace repetitive manual editing in After Effects.">AfterLab</a><span class="term-tag oss">OPEN SOURCE</span><br>
                     <a href="https://github.com/AzmiBousedra/TuneWear" target="_blank" class="terminal-link" data-skills="[TuneWear] C++, ESP32, IoT, Blynk, Hardware Assembly" data-desc="Hand-assembled ESP32 wearable, controlled from a phone over Blynk.">TuneWear</a><span class="term-tag oss">OPEN SOURCE</span><br>
                     <a href="#" onclick="return false;" class="terminal-link term-secret" data-skills="[???] ████████, ██████" data-desc="Something new is compiling. Check back soon.">???</a><span class="term-tag soon">SOON</span><br>
                     
@@ -995,6 +1017,14 @@
             <div class="terminal-footer">
                 <span>-- LOGGING --</span>
             </div>
+        </div>
+    </div>
+
+    <div class="imsg" id="imsg" role="status" aria-live="polite">
+        <div class="imsg-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M12 3C6.5 3 2 6.6 2 11c0 2.4 1.3 4.6 3.4 6.1-.2 1.3-.9 2.6-2 3.4 2 .1 3.9-.6 5.3-1.8 1 .2 2.1.3 3.3.3 5.5 0 10-3.6 10-8S17.5 3 12 3z"/></svg></div>
+        <div class="imsg-main">
+            <div class="imsg-head"><b>Azmi</b><span>now</span></div>
+            <div class="imsg-text" id="imsg-text"></div>
         </div>
     </div>
 
@@ -1434,6 +1464,44 @@
                 skillDisplay.style.color = "#888"; // Reset to grey
                 descDisplay.innerText = '';
             });
+        });
+
+        // --- iMESSAGE BANNER: projects without a public repo yet ---
+        const imsg = document.getElementById('imsg');
+        const imsgText = document.getElementById('imsg-text');
+        const pool = [
+            'It will be here soon dw...',
+            'Working on it right now',
+            'Almost ready, check back soon',
+            'Still building this one',
+        ];
+        // only for OPEN SOURCE-tagged projects whose repo isn't up yet
+        const ossPool = [
+            'Not on GitHub yet, soon',
+            'Repo goes public soon',
+            'Cleaning up the code before it goes public',
+        ];
+        const secretPool = [
+            'Stay tuned',
+            'Something big is coming',
+            'Can\'t say yet, stay tuned',
+            'You\'ll see soon',
+        ];
+        let imsgTimer, lastMsg;
+        function showImsg(e) {
+            const link = e.currentTarget;
+            const msgs = link.classList.contains('term-secret') ? secretPool
+                : link.nextElementSibling?.classList.contains('oss') ? ossPool : pool;
+            let msg;
+            do { msg = msgs[Math.floor(Math.random() * msgs.length)]; } while (msgs.length > 1 && msg === lastMsg);
+            imsgText.textContent = lastMsg = msg;
+            imsg.classList.add('show');
+            clearTimeout(imsgTimer);
+            imsgTimer = setTimeout(() => imsg.classList.remove('show'), 4000);
+        }
+        imsg.addEventListener('click', () => imsg.classList.remove('show'));
+        skillLinks.forEach(link => {
+            if (link.getAttribute('href') === '#') link.addEventListener('click', showImsg);
         });
 
         // --- MOUSE PARALLAX (desktop only) ---
