@@ -10,7 +10,7 @@
             --dot-color: rgba(255, 255, 255, 0.66);
             --pulse-color: rgba(255, 255, 255, 0.4);
             --text-bg: rgba(255, 255, 255, 0.198);
-            --img-ar: 2657 / 1412;
+            --img-ar: 1721 / 914;
         }
 
         body, html {
@@ -46,10 +46,9 @@
             aspect-ratio: var(--img-ar); 
             box-shadow: 0 0 50px rgba(0,0,0,0.5);
             will-change: transform;
-            transition: transform 1.8s cubic-bezier(0.19, 1, 0.22, 1);
         }
 
-        @media (min-aspect-ratio: 2657/1412) {
+        @media (min-aspect-ratio: 1721/914) {
             .image-container {
                 width: 100vw;
                 height: auto;
@@ -73,6 +72,7 @@
             z-index: 10;
             transform: translate(-50%, -50%);
             transition: transform 0.3s ease;
+            translate: calc(var(--mx, 0) * -5px) calc(var(--my, 0) * -5px);
         }
 
         .hotspot:hover {
@@ -145,13 +145,251 @@
             box-shadow: 0 0 15px rgba(255,255,255,0.6);
         }
 
-        #link-projects { top: 44%; left: 19.8%; }
-        #link-tunewear { top: 55.5%; left: 11.25%; }
-        #link-contact { top: 81.8%; left: 72.7%; }
-        #link-notes { top: 37%; left: 29.7%; }
-        #link-resume { top: 45.7%; left: 76%; }
-        #link-github { top: 32.9%; left: 70.3%; }
-        #link-soon { top: 82.8%; left: 88.8%; }
+        #link-projects { top: 35%; left: 16.3%; }    /* middle of the laptop screen */
+        #link-github { top: 33.4%; left: 68.9%; }    /* inside the cat bed */
+        #link-resume { top: 44.3%; left: 75.5%; }    /* nightstand drawers */
+        #link-contact { top: 83.7%; left: 72.7%; }   /* phone */
+        #link-boxes { top: 75.5%; left: 89.8%; }     /* boxes, info only */
+
+        /* info-only points: no click, label on hover/focus */
+        .hotspot.info { cursor: default; }
+        .hotspot:focus-visible .label { opacity: 1; transform: translateX(0); }
+        .label b { font-weight: 600; margin-right: 6px; }
+        .label.left { left: auto; right: 24px; transform: translateX(10px); }
+        .hotspot:hover .label.left, .hotspot:focus-visible .label.left { transform: translateX(0); }
+
+        /* --- iOS-style contact card --- */
+        .ios-card {
+            width: 360px;
+            max-width: calc(100vw - 32px);
+            max-height: calc(100vh - 48px);
+            overflow-y: auto;
+            background: #000;
+            color: #fff;
+            border-radius: 28px;
+            padding: 14px 16px 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            box-shadow: 0 30px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.08);
+            transform: translateY(60px) scale(.96);
+            opacity: 0;
+            transition: transform .5s cubic-bezier(.32, .72, 0, 1), opacity .3s ease;
+            scrollbar-width: none;
+        }
+        .modal-overlay.open .ios-card { transform: none; opacity: 1; }
+        .ios-top { display: flex; justify-content: space-between; align-items: center; font-size: 17px; color: #0a84ff; margin-bottom: 14px; }
+        .ios-top button { all: unset; cursor: pointer; font-weight: 600; color: #0a84ff; }
+        .ios-avatar { width: 96px; height: 96px; margin: 0 auto 12px; border-radius: 50%; display: grid; place-items: center;
+            background: linear-gradient(180deg, #a5abb7, #828793); font-size: 40px; font-weight: 500; letter-spacing: 1px; }
+        .ios-name { text-align: center; font-size: 28px; font-weight: 600; margin: 0; letter-spacing: -.3px; color: #fff; opacity: 1; }
+        .ios-sub { text-align: center; color: rgba(235,235,245,.6); font-size: 15px; margin: 4px 0 18px; }
+        .ios-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
+        .ios-action { all: unset; cursor: pointer; background: #1c1c1e; border-radius: 12px; padding: 10px 0 8px; display: flex; flex-direction: column; align-items: center; gap: 5px;
+            color: #0a84ff; font-size: 11px; transition: background .2s; }
+        .ios-action:hover { background: #2c2c2e; }
+        .ios-action svg { width: 22px; height: 22px; }
+        .ios-group { background: #1c1c1e; border-radius: 12px; margin-bottom: 14px; overflow: hidden; }
+        .ios-row { all: unset; box-sizing: border-box; cursor: pointer; display: block; width: 100%; padding: 10px 16px; position: relative; transition: background .2s; }
+        .ios-row:hover { background: #2c2c2e; }
+        .ios-row + .ios-row::before { content: ''; position: absolute; top: 0; left: 16px; right: 0; height: 1px; background: rgba(84,84,88,.6); }
+        .ios-k { display: block; font-size: 13px; color: rgba(235,235,245,.6); margin-bottom: 2px; }
+        .ios-v { display: block; font-size: 17px; color: #0a84ff; word-break: break-all; }
+        .ios-link { color: #0a84ff; font-size: 17px; padding: 13px 16px; }
+        .ios-action:focus-visible, .ios-row:focus-visible, .ios-top button:focus-visible { outline: 2px solid #0a84ff; outline-offset: -2px; }
+
+        /* --- macOS-style resume window (Preview-like) --- */
+        /* no window: the page floats on its own, the toolbar floats above it */
+        .mac-window {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+        .mac-bar { flex: none; height: 50px; margin-top: 20px; max-width: calc(100vw - 24px); display: flex; align-items: center; gap: 14px; padding: 0 9px 0 16px;
+            background: rgba(38,38,40,.72); backdrop-filter: blur(24px) saturate(180%); -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border: .5px solid rgba(255,255,255,.16); border-radius: 16px;
+            box-shadow: 0 14px 40px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.08); user-select: none; -webkit-user-select: none;
+            transform: translateY(-16px); opacity: 0; transition: transform .5s cubic-bezier(.2, .9, .3, 1) .05s, opacity .3s ease .05s; }
+        .modal-overlay.open .mac-bar { transform: none; opacity: 1; }
+        .pdf-stage { transform: scale(.96) translateY(14px); opacity: 0; transition: transform .5s cubic-bezier(.2, .9, .3, 1), opacity .35s ease; }
+        .modal-overlay.open .pdf-stage { transform: none; opacity: 1; }
+        .mac-lights { display: flex; gap: 8px; flex: none; }
+        .mac-light { all: unset; cursor: pointer; width: 12px; height: 12px; border-radius: 50%; display: grid; place-items: center;
+            font: 600 9px/1 -apple-system, sans-serif; color: rgba(0,0,0,.6); box-shadow: inset 0 0 0 .5px rgba(0,0,0,.25); }
+        .mac-light.red { background: #ff5f57; }
+        .mac-light.yellow { background: #febc2e; }
+        .mac-light.green { background: #28c840; }
+        .mac-light::before { opacity: 0; transition: opacity .1s; }
+        .mac-lights:hover .mac-light::before { opacity: 1; }
+        .mac-light.red::before { content: '×'; font-size: 11px; }
+        .mac-light.yellow::before { content: '−'; }
+        .mac-light.green::before { content: '+'; }
+
+        .mac-doc { display: flex; align-items: center; gap: 9px; min-width: 0; flex: 0 1 auto; margin-left: 4px; padding-right: 14px; border-right: 1px solid rgba(255,255,255,.12); height: 30px; }
+        .mac-doc svg { width: 22px; height: 26px; flex: none; filter: drop-shadow(0 1px 1px rgba(0,0,0,.4)); }
+        .mac-doc div { display: flex; flex-direction: column; min-width: 0; line-height: 1.2; }
+        .mac-name { color: #f2f2f7; font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .mac-sub { color: rgba(235,235,245,.5); font-size: 11px; }
+
+        .mac-tools { display: flex; align-items: center; gap: 8px; flex: none; }
+        .seg { display: flex; gap: 2px; padding: 2px; border-radius: 8px; background: rgba(0,0,0,.25); box-shadow: inset 0 0 0 .5px rgba(255,255,255,.1); }
+        .seg-btn, .tool-btn { all: unset; box-sizing: border-box; cursor: pointer; height: 26px; min-width: 30px; padding: 0 7px; border-radius: 6px;
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px; color: #d1d1d6; font-size: 12px; transition: background .15s, color .15s; }
+        .seg-btn:hover, .tool-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+        .seg-btn[aria-pressed="true"] { background: rgba(255,255,255,.2); color: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.35); }
+        .seg-btn svg, .tool-btn svg { width: 15px; height: 15px; fill: currentColor; }
+        .seg-val { min-width: 50px; font-variant-numeric: tabular-nums; }
+        .tool-btn { background: rgba(0,0,0,.25); box-shadow: inset 0 0 0 .5px rgba(255,255,255,.1); }
+        .tool-btn.primary { background: #0a84ff; color: #fff; box-shadow: none; padding: 0 11px; font-weight: 500; }
+        .tool-btn.primary:hover { background: #2895ff; }
+        .bar-sep { width: 1px; height: 22px; background: rgba(255,255,255,.12); }
+        .seg-btn:focus-visible, .tool-btn:focus-visible, .mac-light:focus-visible { outline: 2px solid #0a84ff; outline-offset: 1px; }
+
+        .pdf-view { flex: 1; align-self: stretch; position: relative; overflow: auto; background: transparent; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.25) transparent; overscroll-behavior: contain; }
+        .pdf-view.hand { cursor: grab; }
+        .pdf-view.hand.dragging { cursor: grabbing; }
+        .pdf-view.zoom { cursor: zoom-in; }
+        .pdf-view.zoom.out { cursor: zoom-out; }
+        .pdf-stage { display: grid; justify-items: center; align-content: center; gap: 16px; box-sizing: border-box; min-width: 100%; min-height: 100%; width: max-content; padding: 18px; }
+        .pdf-stage canvas { display: block; background: #fff; border-radius: 3px; box-shadow: 0 30px 80px rgba(0,0,0,.55), 0 8px 20px rgba(0,0,0,.3); }
+        .pdf-loading { position: absolute; inset: 0; display: grid; place-items: center; color: rgba(235,235,245,.6); font-size: 13px; pointer-events: none; }
+        /* file:// fallback (Chrome's own viewer, toolbar hidden): a frame the exact shape of the
+           Letter page, so the viewer has no spare room to fill with its grey background */
+        .pdf-fallback { position: relative; height: calc(100vh - 110px); aspect-ratio: 8.5 / 11; max-width: calc(100vw - 24px); margin: 18px auto;
+            overflow: hidden; background: #fff; border-radius: 3px; box-shadow: 0 30px 80px rgba(0,0,0,.55), 0 8px 20px rgba(0,0,0,.3); }
+        #resume-frame { position: absolute; inset: -4px; width: calc(100% + 8px); height: calc(100% + 8px); border: 0; } /* clips Chrome's few-pixel grey rim */
+        .mac-window.fallback .pdf-view, .mac-window.fallback .pdf-only { display: none; }
+
+        @media (max-width: 700px) {
+            .mac-sub, .tool-btn span, .bar-sep, #pdf-fit { display: none; }
+            .mac-bar { gap: 10px; padding: 0 10px 0 12px; }
+            .mac-tools { gap: 6px; }
+            .seg-tools { display: none; }
+        }
+
+        /* --- Package tracking: everything I'm building, followed like deliveries (fed by now.json) --- */
+        .tk-card {
+            width: 460px;
+            max-width: calc(100vw - 32px);
+            max-height: calc(100vh - 48px);
+            overflow-y: auto;
+            background: #f4f5f5;
+            color: #0f1111;
+            border-radius: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            box-shadow: 0 30px 80px rgba(0,0,0,.55);
+            transform: translateY(40px) scale(.97);
+            opacity: 0;
+            transition: transform .5s cubic-bezier(.32, .72, 0, 1), opacity .3s ease;
+            scrollbar-width: none;
+        }
+        .modal-overlay.open .tk-card { transform: none; opacity: 1; }
+        .tk-top { position: sticky; top: 0; z-index: 2; display: flex; align-items: flex-start; gap: 10px; padding: 18px 18px 14px; background: rgba(244,245,245,.92); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .tk-top div { flex: 1; }
+        .tk-title { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -.3px; color: #0f1111; opacity: 1; }
+        .tk-count { margin-top: 2px; font-size: 13px; color: #565959; }
+        .tk-x { all: unset; cursor: pointer; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: 18px; color: #565959; background: #e6e8e8; flex: none; }
+        .tk-x:hover { background: #dadddd; color: #0f1111; }
+
+        .tk-list { list-style: none; margin: 0; padding: 0 12px 4px; display: flex; flex-direction: column; gap: 10px; }
+        .tk-pkg { background: #fff; border-radius: 14px; box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 0 0 1px rgba(0,0,0,.04); overflow: hidden; --tk: #067d62; }
+        .tk-pkg.ordered { --tk: #c7843b; }
+        .tk-head { all: unset; box-sizing: border-box; cursor: pointer; display: block; width: 100%; padding: 14px 14px 12px; }
+        .tk-head:hover { background: #fafbfb; }
+        .tk-head:focus-visible { outline: 2px solid var(--tk); outline-offset: -2px; border-radius: 14px; }
+        .tk-row { display: flex; align-items: center; gap: 12px; }
+        .tk-box { width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; flex: none; background: color-mix(in srgb, var(--tk) 12%, #fff); }
+        .tk-box svg { width: 20px; height: 20px; fill: var(--tk); }
+        .tk-name { flex: 1; min-width: 0; }
+        .tk-name b { display: block; font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .tk-st { font-size: 13px; font-weight: 600; color: var(--tk); }
+        .tk-eta { text-align: right; font-size: 12px; color: #6f7373; max-width: 40%; }
+        .tk-eta b { display: block; font-size: 13px; color: #0f1111; font-weight: 600; }
+        .tk-chev { width: 16px; height: 16px; fill: #8d9191; flex: none; transition: transform .3s; }
+        .tk-pkg.open .tk-chev { transform: rotate(180deg); }
+
+        /* mini tracker: 4 stops, a fill and a truck at the progress point */
+        .tk-track { position: relative; height: 26px; margin: 10px 6px 0; }
+        .tk-line, .tk-fill { position: absolute; left: 0; top: 18px; height: 3px; border-radius: 3px; }
+        .tk-line { right: 0; background: #e3e6e6; }
+        .tk-fill { width: calc(var(--p, 0) * 100%); background: var(--tk); transition: width 1.2s cubic-bezier(.2, .9, .3, 1); }
+        .tk-dot { position: absolute; top: 14px; width: 11px; height: 11px; margin-left: -5.5px; border-radius: 50%; background: #fff; border: 2.5px solid #d5d9d9; box-sizing: border-box; }
+        .tk-dot.on { border-color: var(--tk); background: var(--tk); }
+        .tk-truck { position: absolute; top: 0; left: calc(var(--p, 0) * 100%); width: 20px; height: 14px; margin-left: -10px; transition: left 1.2s cubic-bezier(.2, .9, .3, 1); animation: bump .5s ease-in-out infinite alternate; }
+        .tk-truck svg { width: 100%; height: 100%; fill: var(--tk); }
+        .tk-pkg.delivered .tk-truck { display: none; }
+        @keyframes bump { to { transform: translateY(-1.5px); } }
+        .tk-last { margin-top: 8px; font-size: 12px; color: #565959; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .tk-last b { color: #0f1111; font-weight: 500; }
+
+        /* tap a package: its full tracking history slides open */
+        .tk-more { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .4s cubic-bezier(.2, .9, .3, 1); }
+        .tk-pkg.open .tk-more { grid-template-rows: 1fr; }
+        .tk-more > div { overflow: hidden; }
+        .tk-hist { list-style: none; margin: 0; padding: 4px 16px 16px 18px; border-top: 1px solid #eef0f0; }
+        .tk-hist li { position: relative; padding: 12px 0 0 22px; }
+        .tk-hist li::before { content: ''; position: absolute; left: 1px; top: 17px; width: 9px; height: 9px; border-radius: 50%; background: #d5d9d9; }
+        .tk-hist li:first-child::before { background: var(--tk); box-shadow: 0 0 0 4px color-mix(in srgb, var(--tk) 18%, transparent); }
+        .tk-hist li::after { content: ''; position: absolute; left: 5px; top: 28px; bottom: -14px; width: 2px; background: #e3e6e6; }
+        .tk-hist li:last-child::after { display: none; }
+        .tk-when { font-size: 11px; color: #6f7373; }
+        .tk-what { font-size: 13px; color: #0f1111; line-height: 1.35; }
+        .tk-hist li:first-child .tk-what { font-weight: 600; }
+        .tk-foot { margin: 12px 0 16px; font-size: 11px; color: #8d9191; text-align: center; }
+
+        /* --- GitHub-style profile card --- */
+        .gh-card {
+            width: 640px;
+            max-width: calc(100vw - 32px);
+            max-height: calc(100vh - 48px);
+            overflow-y: auto;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            color: #e6edf3;
+            font: 14px/1.5 -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+            box-shadow: 0 30px 80px rgba(0,0,0,.6);
+            transform: translateY(40px) scale(.97);
+            opacity: 0;
+            transition: transform .5s cubic-bezier(.32, .72, 0, 1), opacity .3s ease;
+            scrollbar-width: none;
+        }
+        .modal-overlay.open .gh-card { transform: none; opacity: 1; }
+        .gh-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid #30363d; background: #010409; border-radius: 12px 12px 0 0; }
+        .gh-bar svg { width: 24px; height: 24px; fill: #e6edf3; }
+        .gh-bar span { font-weight: 600; flex: 1; }
+        .gh-bar button { all: unset; cursor: pointer; color: #7d8590; font-size: 20px; line-height: 1; padding: 2px 6px; border-radius: 6px; }
+        .gh-bar button:hover { color: #e6edf3; background: #21262d; }
+        .gh-body { padding: 20px 16px 16px; }
+        .gh-head { display: flex; gap: 16px; align-items: center; margin-bottom: 14px; }
+        .gh-head img { width: 72px; height: 72px; border-radius: 50%; border: 1px solid #30363d; background: #21262d; flex: none; }
+        .gh-name { margin: 0; font-size: 20px; font-weight: 600; line-height: 1.25; color: #e6edf3; opacity: 1; letter-spacing: 0; }
+        .gh-login { color: #7d8590; font-size: 16px; font-weight: 300; }
+        .gh-bio { margin: 0 0 12px; }
+        .gh-stats { display: flex; gap: 14px; color: #7d8590; margin-bottom: 18px; font-size: 13px; }
+        .gh-stats b { color: #e6edf3; font-weight: 600; }
+        .gh-stats:empty { display: none; }
+        .gh-label { font-size: 14px; margin: 0 0 8px; color: #e6edf3; }
+        .gh-cal-box { border: 1px solid #30363d; border-radius: 6px; padding: 12px 14px 10px; margin-bottom: 16px; }
+        .gh-cal-wrap { overflow-x: auto; scrollbar-width: none; }
+        .gh-cal-wrap::-webkit-scrollbar { display: none; }
+        .gh-cal-inner { min-width: 540px; }
+        .gh-months { position: relative; height: 16px; font-size: 11px; color: #7d8590; }
+        .gh-months span { position: absolute; top: 0; }
+        .gh-cal { display: grid; grid-template-rows: repeat(7, auto); grid-auto-flow: column; grid-auto-columns: 1fr; gap: 3px; }
+        .gh-cal i { aspect-ratio: 1; border-radius: 2px; background: #151b23; outline: 1px solid rgba(27,31,35,.06); outline-offset: -1px; }
+        .gh-cal i[data-l="1"] { background: #0e4429; }
+        .gh-cal i[data-l="2"] { background: #006d32; }
+        .gh-cal i[data-l="3"] { background: #26a641; }
+        .gh-cal i[data-l="4"] { background: #39d353; }
+        .gh-cal-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 11px; color: #7d8590; }
+        .gh-legend { display: flex; align-items: center; gap: 3px; }
+        .gh-legend i { width: 10px; height: 10px; border-radius: 2px; }
+        .gh-cal-box.failed .gh-cal-wrap, .gh-cal-box.failed .gh-legend { display: none; }
+        .gh-btn { display: block; text-align: center; padding: 8px 16px; border-radius: 6px; background: #238636; color: #fff; font-weight: 600; text-decoration: none; border: 1px solid rgba(240,246,252,.1); transition: background .2s; }
+        .gh-btn:hover { background: #2ea043; }
+        .gh-btn:focus-visible, .gh-bar button:focus-visible { outline: 2px solid #4493f8; outline-offset: 2px; }
 
         .instruction-label {
             background-color: var(--text-bg);
@@ -375,6 +613,28 @@
             background-color: transparent; /* Ensure no block background */
         }
 
+        /* two-line footer: stack, then a short description */
+        .terminal-footer.project-footer { flex-direction: column; align-items: flex-start; justify-content: center; gap: 1px; min-height: calc(2 * 1.6em + 4px); }
+        #project-desc { font-weight: 400; color: #8a8a8a; letter-spacing: .3px; }
+        #project-desc:empty { display: none; }
+
+        /* project tags in the terminal list */
+        .term-tag {
+            display: inline-block;
+            margin-left: -6px;
+            padding: 0 6px;
+            font-size: 10px;
+            line-height: 16px;
+            letter-spacing: 1px;
+            border-radius: 4px;
+            border: 1px solid;
+            vertical-align: 1px;
+        }
+        .term-tag.new { color: #27c93f; border-color: rgba(39, 201, 63, .45); background: rgba(39, 201, 63, .08); }
+        .term-tag.oss { color: #58a6ff; border-color: rgba(88, 166, 255, .45); background: rgba(88, 166, 255, .08); }
+        .term-tag.soon { color: #888; border-color: #444; animation: blink 2s infinite; }
+        .terminal-link.term-secret { color: #777; cursor: default; }
+
         /* TERMINAL STATUS BAR (Updated: Monochrome & Positioned) */
         .terminal-footer {
             /* Removed margin-top to sit flush at bottom if content pushes it, 
@@ -500,7 +760,7 @@
         <div class="image-container">
             <img src="bg.png" alt="Workspace Portfolio" class="portfolio-image" id="main-bg">
 
-            <!-- CHANGED: Replaced Comments4Me link with Projects Modal Trigger -->
+            <!-- Laptop: projects terminal -->
             <a href="#" class="hotspot" id="link-projects" onclick="openProjectsModal(event)">
                 <span class="dot"></span>
                 <span class="label">Projects</span>
@@ -513,26 +773,29 @@
             </a>
             -->
 
-            <!-- Triggers Contact Modal -->
+            <!-- Phone: iOS contact card -->
             <a href="#" class="hotspot" id="link-contact" onclick="openContactModal(event)">
                 <span class="dot"></span>
                 <span class="label">Contact</span>
             </a>
 
-            <!-- Triggers the Notes Modal -->
-            <a href="#" class="hotspot" id="link-notes" onclick="openNotesModal(event)">
-                <span class="dot"></span>
-                <span class="label">Notes</span>
-            </a>
 
-            <a href="resume.pdf" class="hotspot" id="link-resume">
+            <!-- Drawers: resume -->
+            <a href="resume.pdf" target="_blank" rel="noopener" class="hotspot" id="link-resume" onclick="openResumeModal(event)">
                 <span class="dot"></span>
                 <span class="label">Resume</span>
             </a>
 
-            <a href="https://github.com/azmibousedra" class="hotspot" id="link-github">
+            <!-- Cat bed: GitHub -->
+            <a href="https://github.com/azmibousedra" target="_blank" rel="noopener" class="hotspot" id="link-github" onclick="openGithubModal(event)">
                 <span class="dot"></span>
                 <span class="label">GitHub</span>
+            </a>
+
+            <!-- Info only -->
+            <a href="#" class="hotspot" id="link-boxes" onclick="openTrackModal(event)">
+                <span class="dot"></span>
+                <span class="label left"><b>Track packages</b><span id="track-label">what I'm building</span></span>
             </a>
 
             <!-- Triggers the Terminal Modal (Soon) -->
@@ -546,44 +809,130 @@
         </div>
     </div>
 
-    <!-- NOTES MODAL STRUCTURE -->
-    <div id="notes-modal" class="modal-overlay" onclick="closeNotesModal(event)">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <h3>Personal Notes</h3>
-            <div class="modal-options">
-                <a href="linux.pdf" target="_blank" class="modal-option">
-                    <span class="dot-small"></span>
-                    <span class="option-text">Linux.pdf</span>
-                </a>
-                <a href="Git.pdf" target="_blank" class="modal-option">
-                    <span class="dot-small"></span>
-                    <span class="option-text">Git.pdf</span>
-                </a>
-                <a href="LLMs.pdf" target="_blank" class="modal-option">
-                    <span class="dot-small"></span>
-                    <span class="option-text">LLMs.pdf</span>
-                </a>
+    <!-- CONTACT MODAL STRUCTURE -->
+    <div id="contact-modal" class="modal-overlay" onclick="closeContactModal(event)">
+        <div class="ios-card" role="dialog" aria-modal="true" aria-labelledby="ios-name" onclick="event.stopPropagation()">
+            <div class="ios-top"><span aria-hidden="true">‹ Contacts</span><button onclick="closeContactModal()">Done</button></div>
+            <div class="ios-avatar" aria-hidden="true">AB</div>
+            <h3 class="ios-name" id="ios-name">Azmi Bousedra</h3>
+            <p class="ios-sub">Software Engineering · Concordia</p>
+            <div class="ios-actions">
+                <a class="ios-action" href="mailto:a_boused@live.concordia.ca">
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5h18a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zm1 2.2V17h16V7.2l-8 5.3-8-5.3zM5.3 7 12 11.4 18.7 7H5.3z"/></svg>mail</a>
+                <a class="ios-action" href="https://linkedin.com/in/azmibousedra" target="_blank" rel="noopener">
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3 9.5h4V21H3zM9.5 9.5h3.8v1.6h.1c.5-1 1.8-2 3.7-2 4 0 4.7 2.6 4.7 6V21h-4v-5.3c0-1.3 0-2.9-1.8-2.9s-2 1.4-2 2.8V21h-4z"/></svg>linkedin</a>
+                <a class="ios-action" href="https://github.com/azmibousedra" target="_blank" rel="noopener">
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.3-3.4-1.3-.5-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.6 2.4 1.1 3 .9.1-.7.4-1.1.6-1.4-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.8 1a9.6 9.6 0 0 1 5 0c1.9-1.3 2.8-1 2.8-1 .5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.4 4.7-4.6 5 .4.3.7.9.7 1.9V21c0 .3.2.6.7.5A10 10 0 0 0 12 2z"/></svg>github</a>
+                <a class="ios-action" href="resume.pdf" target="_blank" rel="noopener">
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 2h8l6 6v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm7 1.5V9h5.5L13 3.5zM8 13h8v1.5H8zm0 3.5h8V18H8z"/></svg>résumé</a>
             </div>
-            <button class="close-modal" onclick="closeNotesModal()">Close</button>
+            <div class="ios-group">
+                <button class="ios-row" onclick="copyEmail()"><span class="ios-k">email · tap to copy</span><span class="ios-v" id="email-text">a_boused@live.concordia.ca</span></button>
+                <a class="ios-row" href="https://linkedin.com/in/azmibousedra" target="_blank" rel="noopener"><span class="ios-k">linkedin</span><span class="ios-v">linkedin.com/in/azmibousedra</span></a>
+                <a class="ios-row" href="https://github.com/azmibousedra" target="_blank" rel="noopener"><span class="ios-k">github</span><span class="ios-v">github.com/azmibousedra</span></a>
+            </div>
+            <div class="ios-group">
+                <a class="ios-row ios-link" href="mailto:a_boused@live.concordia.ca">Send Message</a>
+                <button class="ios-row ios-link" onclick="copyEmail()">Copy Email Address</button>
+            </div>
         </div>
     </div>
 
-    <!-- CONTACT MODAL STRUCTURE -->
-    <div id="contact-modal" class="modal-overlay" onclick="closeContactModal(event)">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <h3>Get in Touch</h3>
-            <div class="modal-options">
-                <div class="modal-option" onclick="copyEmail()">
-                    <span class="dot-small"></span>
-                    <span class="option-text" id="email-text">a_boused@live.concordia.ca</span>
+    <!-- RESUME WINDOW -->
+    <div id="resume-modal" class="modal-overlay" onclick="closeResumeModal(event)">
+        <div class="mac-window" id="resume-window" role="dialog" aria-modal="true" aria-label="Résumé" onclick="event.stopPropagation()">
+            <div class="mac-bar">
+                <div class="mac-lights">
+                    <button class="mac-light red" onclick="closeResumeModal()" aria-label="Close"></button>
+                    <button class="mac-light yellow" onclick="closeResumeModal()" aria-label="Minimize"></button>
+                    <button class="mac-light green" onclick="toggleResumeFullscreen()" aria-label="Full screen"></button>
                 </div>
-                <a href="https://linkedin.com/in/azmibousedra" target="_blank" class="modal-option">
-                    <span class="dot-small"></span>
-                    <span class="option-text">LinkedIn</span>
-                </a>
-              
+                <div class="mac-doc">
+                    <svg viewBox="0 0 22 26" aria-hidden="true"><path fill="#f2f2f7" d="M2 0h13l7 7v17a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2z"/><path fill="#c7c7cc" d="M15 0l7 7h-5a2 2 0 0 1-2-2z"/><rect x="3" y="15" width="16" height="7" rx="1.5" fill="#ff453a"/><text x="11" y="20.6" text-anchor="middle" font-size="5.2" font-weight="700" fill="#fff" font-family="-apple-system, sans-serif">PDF</text></svg>
+                    <div><span class="mac-name">azmi_resume.pdf</span><span class="mac-sub" id="pdf-sub">PDF document</span></div>
+                </div>
+                <div class="mac-tools">
+                    <div class="seg seg-tools pdf-only" role="group" aria-label="Tool">
+                        <button class="seg-btn" data-tool="hand" aria-pressed="true" title="Hand tool (H)">
+                            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M7.5 1.5a1 1 0 0 1 1 1V7h.5V3a1 1 0 0 1 2 0v4h.5V4.5a1 1 0 0 1 2 0V10a5 5 0 0 1-5 5H8.2a5 5 0 0 1-3.9-1.9L1.7 9.9a1 1 0 0 1 1.5-1.3L4.5 10V4a1 1 0 0 1 2 0v3h.5V2.5a1 1 0 0 1 .5-1z"/></svg>
+                        </button>
+                        <button class="seg-btn" data-tool="zoom" aria-pressed="false" title="Zoom tool (Z), Option-click to zoom out">
+                            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6.5 1a5.5 5.5 0 0 1 4.4 8.8l3.9 3.9-1.1 1.1-3.9-3.9A5.5 5.5 0 1 1 6.5 1zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm-.75 1.75h1.5v1.5h1.5v1.5h-1.5v1.5h-1.5v-1.5h-1.5v-1.5h1.5z"/></svg>
+                        </button>
+                    </div>
+                    <div class="seg pdf-only" role="group" aria-label="Zoom">
+                        <button class="seg-btn" id="pdf-out" title="Zoom out (−)" aria-label="Zoom out"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 7.25h10v1.5H3z"/></svg></button>
+                        <button class="seg-btn seg-val" id="pdf-zoom" title="Fit page (0)">100%</button>
+                        <button class="seg-btn" id="pdf-in" title="Zoom in (+)" aria-label="Zoom in"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M7.25 3h1.5v4.25H13v1.5H8.75V13h-1.5V8.75H3v-1.5h4.25z"/></svg></button>
+                    </div>
+                    <button class="tool-btn pdf-only" id="pdf-fit" title="Fit page (0)" aria-label="Fit page">
+                        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 2h4.5v1.5h-3v3H2zm7.5 0H14v4.5h-1.5v-3h-3zM2 9.5h1.5v3h3V14H2zm10.5 0H14V14H9.5v-1.5h3z"/></svg>
+                    </button>
+                    <span class="bar-sep"></span>
+                    <a class="tool-btn" href="resume.pdf" target="_blank" rel="noopener" title="Open in a new tab" aria-label="Open in a new tab">
+                        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M9 2h5v5h-1.5V4.6L7.3 9.8 6.2 8.7l5.2-5.2H9zM3 4h4v1.5H3.5v7h7V9H12v4a.5.5 0 0 1-.5.5h-9A.5.5 0 0 1 2 13V4.5A.5.5 0 0 1 2.5 4z"/></svg>
+                    </a>
+                    <a class="tool-btn primary" href="resume.pdf" download="Azmi-Bousedra-Resume.pdf" title="Download">
+                        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M7.25 1.5h1.5v7.2l2.7-2.7 1.06 1.06L8 11.56 3.49 7.06 4.55 6l2.7 2.7zM2 13h12v1.5H2z"/></svg><span>Download</span>
+                    </a>
+                </div>
             </div>
-            <button class="close-modal" onclick="closeContactModal()">Close</button>
+            <div class="pdf-view hand" id="pdf-view">
+                <div class="pdf-stage" id="pdf-stage"></div>
+                <div class="pdf-loading" id="pdf-loading">Loading…</div>
+            </div>
+            <div class="pdf-fallback" id="pdf-fallback" hidden><iframe id="resume-frame" title="Azmi Bousedra résumé"></iframe></div>
+        </div>
+    </div>
+
+    <!-- PACKAGE TRACKING (content comes from now.json) -->
+    <div id="track-modal" class="modal-overlay" onclick="closeTrackModal(event)">
+        <div class="tk-card" role="dialog" aria-modal="true" aria-labelledby="tk-title" onclick="event.stopPropagation()">
+            <div class="tk-top">
+                <div>
+                    <h3 class="tk-title" id="tk-title">Your deliveries</h3>
+                    <div class="tk-count" id="tk-count"></div>
+                </div>
+                <button class="tk-x" onclick="closeTrackModal()" aria-label="Close">×</button>
+            </div>
+            <ul class="tk-list" id="tk-list"></ul>
+            <p class="tk-foot" id="tk-updated"></p>
+        </div>
+    </div>
+
+    <!-- GITHUB PROFILE CARD -->
+    <div id="github-modal" class="modal-overlay" onclick="closeGithubModal(event)">
+        <div class="gh-card" role="dialog" aria-modal="true" aria-labelledby="gh-name" onclick="event.stopPropagation()">
+            <div class="gh-bar">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.3-3.4-1.3-.5-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.6 2.4 1.1 3 .9.1-.7.4-1.1.6-1.4-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.8 1a9.6 9.6 0 0 1 5 0c1.9-1.3 2.8-1 2.8-1 .5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.4 4.7-4.6 5 .4.3.7.9.7 1.9V21c0 .3.2.6.7.5A10 10 0 0 0 12 2z"/></svg>
+                <span>GitHub</span>
+                <button onclick="closeGithubModal()" aria-label="Close">×</button>
+            </div>
+            <div class="gh-body">
+                <div class="gh-head">
+                    <img id="gh-avatar" src="https://avatars.githubusercontent.com/u/85817737?v=4" alt="">
+                    <div>
+                        <h3 class="gh-name" id="gh-name">Azmi-Salah Bousedra</h3>
+                        <div class="gh-login" id="gh-login">AzmiBousedra</div>
+                    </div>
+                </div>
+                <p class="gh-bio" id="gh-bio">SWE @ Concordia</p>
+                <div class="gh-stats" id="gh-stats"></div>
+                <p class="gh-label" id="gh-total">Contributions in the last year</p>
+                <div class="gh-cal-box" id="gh-cal-box">
+                    <div class="gh-cal-wrap" id="gh-cal-wrap">
+                        <div class="gh-cal-inner">
+                            <div class="gh-months" id="gh-months"></div>
+                            <div class="gh-cal" id="gh-cal" role="img" aria-label="Contribution calendar"></div>
+                        </div>
+                    </div>
+                    <div class="gh-cal-foot">
+                        <a href="https://github.com/azmibousedra" target="_blank" rel="noopener" style="color:#7d8590;text-decoration:none">github.com/azmibousedra</a>
+                        <span class="gh-legend">Less <i style="background:#151b23"></i><i style="background:#0e4429"></i><i style="background:#006d32"></i><i style="background:#26a641"></i><i style="background:#39d353"></i> More</span>
+                    </div>
+                </div>
+                <a class="gh-btn" href="https://github.com/azmibousedra" target="_blank" rel="noopener">View profile on GitHub</a>
+            </div>
         </div>
     </div>
 
@@ -602,19 +951,21 @@
                 <div><span class="prompt">➜</span> <span class="path">~/projects</span> ls -1</div>
                 <div class="output">
                     <!-- Dynamic Links with Data Attributes for Skills -->
-                    <a href="#" onclick="return false;" class="terminal-link" data-skills="[AfterLab] ExtendScript, JavaScript, React, GSAP, XML">AfterLab</a><br>
-                    <a href="#" onclick="return false;" class="terminal-link" data-skills="[InternPal] Python, Web Automation, Gemini API, CLI">InternPal</a><br>
-                    <a href="#" onclick="return false;" class="terminal-link" data-skills="[Ironify] Python, FastAPI, TensorFlow, Gemini API, MongoDB">Ironify (ConUHacks)</a><br>
-                    <a href="https://github.com/AzmiBousedra/TuneWear" target="_blank" class="terminal-link" data-skills="[TuneWear] C++, ESP32, IoT, Blynk, Hardware Assembly">TuneWear</a><br>
-                    <a href="https://comments4.me" target="_blank" class="terminal-link" data-skills="[Comments4Me] JavaScript, Node.js, Express, Gemini API, Prism.js">Comments4Me</a><br>
+                    <a href="#" onclick="return false;" class="terminal-link" data-skills="[Train Your Driver] Swift, SwiftUI, Python, PyTorch, Reinforcement Learning" data-desc="iOS game where you evolve a neural-net F1 driver across 37 real circuits.">Train Your Driver</a><span class="term-tag new">NEW</span><br>
+                    <a href="#" onclick="return false;" class="terminal-link" data-skills="[Gazey] Swift, AppKit, SwiftUI, ScreenCaptureKit, MCP, Ollama" data-desc="Press ⌥Space, type a few words, and an AI agent acts on whatever is on your screen.">Gazey</a><span class="term-tag new">NEW</span><br>
+                    <a href="#" onclick="return false;" class="terminal-link" data-skills="[Queued] TypeScript, React Native, Expo, Supabase, Postgres, TanStack Query" data-desc="Rate and review music, and follow people whose taste you trust.">Queued</a><br>
+                    <a href="#" onclick="return false;" class="terminal-link" data-skills="[AfterLab] ExtendScript, JavaScript, React, GSAP, XML" data-desc="One-click actions that replace repetitive manual editing in After Effects.">AfterLab</a><span class="term-tag oss">OPEN SOURCE</span><br>
+                    <a href="https://github.com/AzmiBousedra/TuneWear" target="_blank" class="terminal-link" data-skills="[TuneWear] C++, ESP32, IoT, Blynk, Hardware Assembly" data-desc="Hand-assembled ESP32 wearable, controlled from a phone over Blynk.">TuneWear</a><span class="term-tag oss">OPEN SOURCE</span><br>
+                    <a href="#" onclick="return false;" class="terminal-link term-secret" data-skills="[???] ████████, ██████" data-desc="Something new is compiling. Check back soon.">???</a><span class="term-tag soon">SOON</span><br>
                     
                     <span style="color: #777; font-size: 0.9em; margin-top: 10px; display: inline-block;"># Hover file to see tech stack...</span>
                 </div>
                 <div><span class="prompt">➜</span> <span class="path">~/projects</span> <span class="cursor"></span></div>
             </div>
             <!-- Moved Footer OUT of body, visually at bottom via flex -->
-            <div class="terminal-footer">
+            <div class="terminal-footer project-footer">
                 <span id="project-skills">-- INSERT MODE --</span>
+                <span id="project-desc"></span>
             </div>
         </div>
     </div>
@@ -674,16 +1025,6 @@
         setTimeout(hidePreloader, 3000);
 
 
-        // --- NOTES MODAL LOGIC ---
-        function openNotesModal(e) {
-            e.preventDefault(); 
-            document.getElementById('notes-modal').classList.add('open');
-        }
-
-        function closeNotesModal(e) {
-            document.getElementById('notes-modal').classList.remove('open');
-        }
-
         // --- CONTACT MODAL LOGIC ---
         function openContactModal(e) {
             e.preventDefault();
@@ -709,6 +1050,354 @@
             });
         }
 
+        // --- PACKAGE TRACKING LOGIC ---
+        // Edit now.json (from your phone on github.com) to update the packages.
+        // This copy is only used when now.json can't be fetched (e.g. opening the file directly).
+        const NOW_DEFAULT = { packages: [
+            { project: 'Train Your Driver', status: 'out_for_delivery', progress: 90, eta: 'After App Store review', updates: [
+                { date: '2026-11-13', text: 'Build 37: new onboarding and a guided tour of every tab' },
+                { date: '2026-11-11', text: 'Version 1.0 sent to App Store review' },
+                { date: '2026-10-30', text: 'Duel mode: offline and Game Center online lobbies' },
+                { date: '2026-10-26', text: 'Pit wall moves: 14 moves, unlocked by your race engineer' } ] },
+            { project: 'Gazey', status: 'in_transit', progress: 85, eta: 'This month', updates: [
+                { date: '2026-11-14', text: 'Next release in progress: free AI that runs on your Mac' },
+                { date: '2026-10-08', text: "Gazey now says when something didn't get done" },
+                { date: '2026-10-06', text: 'Agent routing rebuilt: 95% right on unseen requests' },
+                { date: '2026-10-05', text: 'Shipped v0.5.0: every app you use, one sign-in away' },
+                { date: '2026-10-04', text: 'Shipped v0.4.0: Gazey drives your Mac' } ] },
+            { project: '???', status: 'ordered', progress: 5, eta: 'Soon', updates: [
+                { date: '2026-11-14', text: 'Label created. Contents classified.' } ] },
+            { project: 'AfterLab', status: 'delivered', eta: 'Mar 2026', updates: [
+                { date: '2026-03', text: 'Delivered: 20+ one-click actions for After Effects' },
+                { date: '2025-12', text: 'Order placed: automate repetitive editing in After Effects' } ] },
+        ] };
+        // status -> [label, stop reached (0-3)]
+        const TK_STATUS = { ordered: ['Label created', 0], in_transit: ['In transit', 1], out_for_delivery: ['Out for delivery', 2], delivered: ['Delivered', 3] };
+        const TK_BOX = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 3 6.5v11L12 22l9-4.5v-11zm0 2.2 6.4 3.2L12 10.6 5.6 7.4zM5 9l6 3v7.6l-6-3zm8 10.6V12l6-3v7.6z"/></svg>';
+        const TK_TRUCK = '<svg viewBox="0 0 26 18"><path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h12A1.5 1.5 0 0 1 16 2.5V5h4.2a1.5 1.5 0 0 1 1.2.6l3.3 4.4a1.5 1.5 0 0 1 .3.9V13a1.5 1.5 0 0 1-1.5 1.5h-.8a3 3 0 0 1-5.9 0H9.2a3 3 0 0 1-5.9 0H2.5A1.5 1.5 0 0 1 1 13zM18 7v3.5h4.6L20 7zM6.2 12.6a1.6 1.6 0 1 0 0 3.2 1.6 1.6 0 0 0 0-3.2zm13.6 0a1.6 1.6 0 1 0 0 3.2 1.6 1.6 0 0 0 0-3.2z"/></svg>';
+        const TK_CHEV = '<svg class="tk-chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 6 8 10.5 12.5 6l1 1L8 12.5 2.5 7z"/></svg>';
+        let nowData = NOW_DEFAULT;
+
+        // "2026-11-13" -> "Nov 13", "2026-03" -> "Mar 2026"
+        function tkWhen(date) {
+            if (!date) return '';
+            const month = date.length <= 7;
+            return new Date(date + (month ? '-01' : '') + 'T12:00').toLocaleDateString('en-US', month ? { month: 'short', year: 'numeric' } : { month: 'short', day: 'numeric' });
+        }
+
+        function packageItem(pkg) {
+            const status = pkg.status in TK_STATUS ? pkg.status : 'in_transit';
+            const [label, stop] = TK_STATUS[status];
+            const pct = Math.min(100, Math.max(0, Number(pkg.progress) || 0)) / 100;
+            // the truck stays inside its status's stretch of road, so it never runs ahead of the label
+            const p = status === 'delivered' ? 1 : Math.max(stop / 3, Math.min((stop + 1) / 3 - .04, pct));
+            const li = el('li', `tk-pkg ${status}`);
+            li.style.setProperty('--p', p);
+            const head = el('button', 'tk-head');
+            head.setAttribute('aria-expanded', 'false');
+            const row = el('div', 'tk-row');
+            const box = el('span', 'tk-box'); box.innerHTML = TK_BOX;
+            const name = el('div', 'tk-name'); name.append(el('b', null, pkg.project || 'Untitled'), el('span', 'tk-st', label));
+            const eta = el('div', 'tk-eta'); eta.append(status === 'delivered' ? 'Delivered' : 'Arriving', el('b', null, pkg.eta || 'Soon'));
+            row.append(box, name, eta); row.insertAdjacentHTML('beforeend', TK_CHEV);
+            const track = el('div', 'tk-track'); track.setAttribute('aria-hidden', 'true');
+            track.innerHTML = `<div class="tk-line"></div><div class="tk-fill"></div>${[0, 1, 2, 3].map(i => `<i class="tk-dot${i <= stop ? ' on' : ''}" style="left:${i / 3 * 100}%"></i>`).join('')}<div class="tk-truck">${TK_TRUCK}</div>`;
+            const updates = pkg.updates || [];
+            const last = el('div', 'tk-last');
+            if (updates[0]) last.append(`${tkWhen(updates[0].date)} · `, el('b', null, updates[0].text || ''));
+            head.append(row, track, last);
+            const more = el('div', 'tk-more'), inner = el('div'), hist = el('ul', 'tk-hist');
+            hist.append(...updates.map(u => { const h = el('li'); h.append(el('div', 'tk-when', `${tkWhen(u.date)} · ${u.place || 'Montréal, QC'}`), el('div', 'tk-what', u.text || '')); return h; }));
+            inner.append(hist); more.append(inner);
+            head.onclick = () => {
+                const open = !li.classList.contains('open');
+                document.querySelectorAll('.tk-pkg.open').forEach(o => { o.classList.remove('open'); o.querySelector('.tk-head').setAttribute('aria-expanded', 'false'); });
+                li.classList.toggle('open', open); head.setAttribute('aria-expanded', String(open));
+            };
+            li.append(head, more);
+            return li;
+        }
+
+        function renderNow() {
+            const pkgs = Array.isArray(nowData.packages) ? nowData.packages : [];
+            // still on the way first, in the order written; delivered ones at the bottom
+            const ordered = [...pkgs.filter(p => p.status !== 'delivered'), ...pkgs.filter(p => p.status === 'delivered')];
+            document.getElementById('tk-list').replaceChildren(...ordered.map(packageItem));
+            const onWay = pkgs.filter(p => p.status !== 'delivered').length, done = pkgs.length - onWay;
+            document.getElementById('tk-count').textContent = `${onWay} on the way${done ? ` · ${done} delivered` : ''}`;
+            const latest = pkgs.flatMap(p => (p.updates || []).map(u => u.date)).filter(d => d && d.length > 7).sort().pop();
+            if (latest) {
+                const days = Math.round((Date.now() - new Date(latest + 'T12:00')) / 864e5);
+                document.getElementById('tk-updated').textContent = `Last scan ${days <= 0 ? 'today' : days === 1 ? 'yesterday' : `${days} days ago`}`;
+            }
+            document.getElementById('track-label').textContent = `${onWay} on the way`;
+        }
+
+        async function loadNow() {
+            try {
+                const r = await fetch(`now.json?t=${Date.now()}`, { cache: 'no-store' }); // the query busts GitHub Pages' CDN cache
+                if (r.ok) nowData = await r.json();
+            } catch (err) { /* opened as a file, or offline: keep the default */ }
+            renderNow();
+        }
+
+        function openTrackModal(e) {
+            e.preventDefault();
+            document.getElementById('track-modal').classList.add('open');
+            loadNow(); // pick up an edit made since the page loaded
+        }
+
+        function closeTrackModal(e) {
+            document.getElementById('track-modal').classList.remove('open');
+        }
+
+        loadNow();
+
+        // --- GITHUB CARD LOGIC ---
+        const GH_USER = 'AzmiBousedra';
+        // GitHub's own API only serves the contribution calendar to logged-in requests;
+        // this public mirror of it returns one { date, count, level } per day
+        const GH_CAL_API = `https://github-contributions-api.jogruber.de/v4/${GH_USER}?y=last`;
+        let ghLoaded = false;
+
+        function el(tag, cls, text) { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
+
+        function renderCalendar(days) {
+            const cal = document.getElementById('gh-cal'), months = document.getElementById('gh-months');
+            // pad the start so every column is a Sunday-to-Saturday week, like on GitHub
+            const lead = new Date(days[0].date + 'T00:00').getDay();
+            const cells = [...Array(lead).fill(null), ...days];
+            const weeks = Math.ceil(cells.length / 7);
+            const fmt = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' });
+            cal.replaceChildren(...cells.map(d => {
+                const i = el('i');
+                if (!d) { i.style.visibility = 'hidden'; return i; }
+                i.dataset.l = d.level;
+                i.title = `${d.count || 'No'} contribution${d.count === 1 ? '' : 's'} on ${fmt.format(new Date(d.date + 'T00:00'))}`;
+                return i;
+            }));
+            // month label over the first full week of each month
+            const labels = [];
+            let lastMonth = -1;
+            for (let w = 0; w < weeks; w++) {
+                const d = cells[w * 7] || cells[w * 7 + 6];
+                if (!d) continue;
+                const m = new Date(d.date + 'T00:00').getMonth();
+                if (m !== lastMonth && w < weeks - 2) {
+                    const span = el('span', null, new Date(d.date + 'T00:00').toLocaleString('en-US', { month: 'short' }));
+                    span.style.left = `${(w / weeks) * 100}%`;
+                    labels.push(span);
+                }
+                lastMonth = m;
+            }
+            months.replaceChildren(...labels);
+            const wrap = document.getElementById('gh-cal-wrap');
+            wrap.scrollLeft = wrap.scrollWidth; // narrow screens: start on the latest weeks
+        }
+
+        const getJSON = (url) => fetch(url).then(r => r.ok ? r.json() : Promise.reject(r.status));
+
+        async function loadGithub() {
+            if (ghLoaded) return;
+            ghLoaded = true;
+            const [cal, user] = await Promise.allSettled([getJSON(GH_CAL_API), getJSON(`https://api.github.com/users/${GH_USER}`)]);
+            if (cal.status === 'fulfilled') {
+                const total = Object.values(cal.value.total || {})[0];
+                if (total != null) document.getElementById('gh-total').textContent = `${total.toLocaleString('en-US')} contributions in the last year`;
+                renderCalendar(cal.value.contributions);
+                document.getElementById('gh-cal-box').classList.remove('failed');
+            } else {
+                document.getElementById('gh-cal-box').classList.add('failed');
+                document.getElementById('gh-total').textContent = 'Contribution graph unavailable right now';
+            }
+            if (user.status === 'fulfilled') {
+                const u = user.value;
+                if (u.avatar_url) document.getElementById('gh-avatar').src = u.avatar_url;
+                if (u.name) document.getElementById('gh-name').textContent = u.name;
+                if (u.bio) document.getElementById('gh-bio').textContent = u.bio;
+                document.getElementById('gh-stats').replaceChildren(...[[u.public_repos, 'repositories'], [u.followers, 'followers'], [u.following, 'following']].map(([n, label]) => { const s = el('span'); s.append(el('b', null, n), ` ${label}`); return s; }));
+            }
+            // rate-limited or offline: keep what loaded, retry the rest next time the card opens
+            if (cal.status === 'rejected' || user.status === 'rejected') ghLoaded = false;
+        }
+
+        function openGithubModal(e) {
+            e.preventDefault();
+            document.getElementById('github-modal').classList.add('open');
+            loadGithub();
+        }
+
+        function closeGithubModal(e) {
+            document.getElementById('github-modal').classList.remove('open');
+        }
+
+        // fetch the profile and contribution calendar in the background once the page is idle,
+        // so the card is already filled the first time it opens
+        (window.requestIdleCallback || ((fn) => setTimeout(fn, 1200)))(loadGithub);
+
+        // --- RESUME WINDOW LOGIC ---
+        // The browser's own PDF viewer can't be driven from the page, so PDF.js renders it:
+        // that's what lets the toolbar fit, zoom and pan.
+        const PDFJS = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/';
+        const pdf = { pages: [], canvases: [], scale: 1, fit: 1, atFit: true, tool: 'hand', tasks: [], loading: null, renderTimer: 0 };
+        const pdfView = document.getElementById('pdf-view');
+        const pdfStage = document.getElementById('pdf-stage');
+        const resumeWindow = document.getElementById('resume-window');
+        const ACTUAL = 96 / 72; // PDF points -> CSS pixels: what "100%" means
+
+        function loadPdf() {
+            pdf.loading ??= (async () => {
+                const lib = await import(PDFJS + 'pdf.min.mjs');
+                // a same-origin blob wrapper lets the cross-origin worker start as a real module worker
+                lib.GlobalWorkerOptions.workerSrc = URL.createObjectURL(new Blob([`import "${PDFJS}pdf.worker.min.mjs";`], { type: 'text/javascript' }));
+                const doc = await lib.getDocument('resume.pdf').promise;
+                for (let n = 1; n <= doc.numPages; n++) pdf.pages.push(await doc.getPage(n));
+                pdf.canvases = pdf.pages.map(() => pdfStage.appendChild(document.createElement('canvas')));
+                document.getElementById('pdf-sub').textContent = `${doc.numPages} page${doc.numPages > 1 ? 's' : ''} · PDF`;
+            })();
+            return pdf.loading;
+        }
+
+        function fitScale() {
+            const vp = pdf.pages[0].getViewport({ scale: 1 });
+            return Math.min((pdfView.clientWidth - 36) / vp.width, (pdfView.clientHeight - 36) / vp.height);
+        }
+
+        function sizeCanvases() {
+            pdf.pages.forEach((page, i) => {
+                const vp = page.getViewport({ scale: pdf.scale });
+                pdf.canvases[i].style.width = `${vp.width}px`;
+                pdf.canvases[i].style.height = `${vp.height}px`;
+            });
+            document.getElementById('pdf-zoom').textContent = `${Math.round(pdf.scale / ACTUAL * 100)}%`;
+        }
+
+        // CSS-size the pages right away (instant zoom), then re-render them crisp once zooming settles
+        function renderPages() {
+            sizeCanvases();
+            clearTimeout(pdf.renderTimer);
+            pdf.renderTimer = setTimeout(() => {
+                pdf.tasks.forEach(t => t.cancel());
+                const dpr = Math.min(window.devicePixelRatio || 1, 3);
+                pdf.tasks = pdf.pages.map((page, i) => {
+                    const vp = page.getViewport({ scale: pdf.scale * dpr }), c = pdf.canvases[i];
+                    c.width = Math.floor(vp.width); c.height = Math.floor(vp.height);
+                    sizeCanvases();
+                    const task = page.render({ canvasContext: c.getContext('2d'), viewport: vp });
+                    task.promise.catch(() => {}); // cancelled by a newer zoom
+                    return task;
+                });
+            }, 90);
+        }
+
+        // zoom so the point under (cx, cy) in the viewer stays put
+        function setScale(next, cx = pdfView.clientWidth / 2, cy = pdfView.clientHeight / 2) {
+            next = Math.min(Math.max(next, pdf.fit * .5), pdf.fit * 6);
+            const ratio = next / pdf.scale;
+            const x = pdfView.scrollLeft + cx, y = pdfView.scrollTop + cy;
+            pdf.scale = next;
+            pdf.atFit = Math.abs(next - pdf.fit) < 1e-3;
+            renderPages();
+            pdfView.scrollLeft = x * ratio - cx;
+            pdfView.scrollTop = y * ratio - cy;
+        }
+
+        function fitPage() {
+            if (!pdf.pages.length) return;
+            pdf.fit = fitScale();
+            setScale(pdf.fit);
+        }
+
+        function setTool(tool) {
+            pdf.tool = tool;
+            document.querySelectorAll('[data-tool]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.tool === tool)));
+            pdfView.classList.toggle('hand', tool === 'hand');
+            pdfView.classList.toggle('zoom', tool === 'zoom');
+        }
+
+        async function openResumeModal(e) {
+            e.preventDefault();
+            document.getElementById('resume-modal').classList.add('open');
+            try {
+                await loadPdf();
+                document.getElementById('pdf-loading').hidden = true;
+                fitPage();
+            } catch (err) {
+                // PDF.js unavailable: fall back to the browser's own viewer
+                resumeWindow.classList.add('fallback');
+                const frame = document.getElementById('resume-frame');
+                document.getElementById('pdf-fallback').hidden = false;
+                if (!frame.getAttribute('src')) frame.src = 'resume.pdf#toolbar=0&navpanes=0&view=Fit';
+            }
+        }
+
+        function closeResumeModal(e) {
+            document.getElementById('resume-modal').classList.remove('open');
+            if (document.fullscreenElement) document.exitFullscreen();
+        }
+
+        function toggleResumeFullscreen() {
+            if (document.fullscreenElement) document.exitFullscreen();
+            else document.getElementById('resume-modal').requestFullscreen?.();
+        }
+
+        // refit when the viewport changes (including entering/leaving full screen), if the page was fitted
+        window.addEventListener('resize', () => { if (pdf.atFit && pdf.pages.length) fitPage(); });
+
+        document.getElementById('pdf-in').onclick = () => setScale(pdf.scale * 1.25);
+        document.getElementById('pdf-out').onclick = () => setScale(pdf.scale / 1.25);
+        document.getElementById('pdf-zoom').onclick = fitPage;
+        document.getElementById('pdf-fit').onclick = fitPage;
+        document.querySelectorAll('[data-tool]').forEach(b => b.onclick = () => setTool(b.dataset.tool));
+
+        // hand tool: drag to pan · zoom tool: click to zoom in, Option/Alt-click to zoom out
+        let drag = null;
+        pdfView.addEventListener('pointerdown', (e) => {
+            if (e.button !== 0 || !pdf.pages.length) return;
+            if (pdf.tool === 'hand') {
+                drag = { x: e.clientX, y: e.clientY, l: pdfView.scrollLeft, t: pdfView.scrollTop };
+                pdfView.setPointerCapture(e.pointerId);
+                pdfView.classList.add('dragging');
+            } else {
+                const r = pdfView.getBoundingClientRect();
+                setScale(pdf.scale * (e.altKey ? 1 / 1.5 : 1.5), e.clientX - r.left, e.clientY - r.top);
+            }
+        });
+        pdfView.addEventListener('pointermove', (e) => {
+            if (!drag) return;
+            pdfView.scrollLeft = drag.l - (e.clientX - drag.x);
+            pdfView.scrollTop = drag.t - (e.clientY - drag.y);
+        });
+        const endDrag = () => { drag = null; pdfView.classList.remove('dragging'); };
+        pdfView.addEventListener('pointerup', (e) => {
+            const moved = drag && Math.hypot(e.clientX - drag.x, e.clientY - drag.y) > 4;
+            endDrag();
+            if (!moved && e.target.tagName !== 'CANVAS' && pdf.tool === 'hand') closeResumeModal();
+        });
+        pdfView.addEventListener('pointercancel', endDrag);
+        // trackpad pinch (and ctrl/cmd + wheel) zooms around the cursor
+        pdfView.addEventListener('wheel', (e) => {
+            if (!(e.ctrlKey || e.metaKey) || !pdf.pages.length) return;
+            e.preventDefault();
+            const r = pdfView.getBoundingClientRect();
+            setScale(pdf.scale * Math.exp(-e.deltaY * .01), e.clientX - r.left, e.clientY - r.top);
+        }, { passive: false });
+        // Option key flips the zoom cursor to zoom-out
+        ['keydown', 'keyup'].forEach(t => document.addEventListener(t, (e) => { if (e.key === 'Alt') pdfView.classList.toggle('out', t === 'keydown'); }));
+        // shortcuts while the resume is open
+        document.addEventListener('keydown', (e) => {
+            if (!document.getElementById('resume-modal').classList.contains('open') || e.metaKey || e.ctrlKey || !pdf.pages.length) return;
+            if (e.key === '+' || e.key === '=') setScale(pdf.scale * 1.25);
+            else if (e.key === '-') setScale(pdf.scale / 1.25);
+            else if (e.key === '0') fitPage();
+            else if (e.key === 'h' || e.key === 'H') setTool('hand');
+            else if (e.key === 'z' || e.key === 'Z') setTool('zoom');
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') { closeContactModal(); closeProjectsModal(); closeGithubModal(); closeResumeModal(); closeTrackModal(); }
+        });
+
         // --- PROJECTS TERMINAL MODAL LOGIC (New) ---
         function openProjectsModal(e) {
             e.preventDefault();
@@ -733,23 +1422,46 @@
         // Setup hover listeners for project links
         const skillLinks = document.querySelectorAll('.terminal-link');
         const skillDisplay = document.getElementById('project-skills');
+        const descDisplay = document.getElementById('project-desc');
 
         skillLinks.forEach(link => {
             link.addEventListener('mouseenter', () => {
-                const skills = link.getAttribute('data-skills');
-                if (skills && skillDisplay) {
-                    skillDisplay.innerText = skills;
-                    skillDisplay.style.color = "#fff"; // Make text brighter on hover
-                }
+                skillDisplay.innerText = link.getAttribute('data-skills') || '';
+                skillDisplay.style.color = "#fff"; // Make text brighter on hover
+                descDisplay.innerText = link.getAttribute('data-desc') || '';
             });
 
             link.addEventListener('mouseleave', () => {
-                if (skillDisplay) {
-                    skillDisplay.innerText = "-- INSERT MODE --"; // Default Vim-like text
-                    skillDisplay.style.color = "#888"; // Reset to grey
-                }
+                skillDisplay.innerText = "-- INSERT MODE --"; // Default Vim-like text
+                skillDisplay.style.color = "#888"; // Reset to grey
+                descDisplay.innerText = '';
             });
         });
+
+        // --- MOUSE PARALLAX (desktop only) ---
+        const scene = document.querySelector('.image-container');
+        const parallaxOn = matchMedia('(hover: hover) and (pointer: fine) and (min-width: 769px) and (prefers-reduced-motion: no-preference)');
+        let tx = 0, ty = 0, cx = 0, cy = 0; // target / current, both in -1..1
+
+        addEventListener('mousemove', e => {
+            tx = e.clientX / innerWidth * 2 - 1;
+            ty = e.clientY / innerHeight * 2 - 1;
+        });
+        document.documentElement.addEventListener('mouseleave', () => { tx = ty = 0; });
+
+        (function tick() {
+            cx += (tx - cx) * 0.06; // lerp = the buttery lag
+            cy += (ty - cy) * 0.06;
+            if (parallaxOn.matches) {
+                // scale(1.06) leaves headroom so the 1.33% shift + tilt never shows the edges
+                scene.style.transform = `translate(-50%, -50%) perspective(1400px) rotateY(${cx}deg) rotateX(${-cy}deg) translate3d(${-cx * 1.33}%, ${-cy * 1.33}%, 0) scale(1.06)`;
+                scene.style.setProperty('--mx', cx.toFixed(4));
+                scene.style.setProperty('--my', cy.toFixed(4));
+            } else {
+                scene.style.transform = '';
+            }
+            requestAnimationFrame(tick);
+        })();
     </script>
 </body>
 </html>

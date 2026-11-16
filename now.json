@@ -1,0 +1,47 @@
+{
+  "packages": [
+    {
+      "project": "Train Your Driver",
+      "status": "out_for_delivery",
+      "progress": 90,
+      "eta": "After App Store review",
+      "updates": [
+        { "date": "2026-11-13", "text": "Build 37: new onboarding and a guided tour of every tab" },
+        { "date": "2026-11-11", "text": "Version 1.0 sent to App Store review" },
+        { "date": "2026-10-30", "text": "Duel mode: offline and Game Center online lobbies" },
+        { "date": "2026-10-26", "text": "Pit wall moves: 14 moves, unlocked by your race engineer" }
+      ]
+    },
+    {
+      "project": "Gazey",
+      "status": "in_transit",
+      "progress": 85,
+      "eta": "This month",
+      "updates": [
+        { "date": "2026-11-14", "text": "Next release in progress: free AI that runs on your Mac" },
+        { "date": "2026-10-08", "text": "Gazey now says when something didn't get done" },
+        { "date": "2026-10-06", "text": "Agent routing rebuilt: 95% right on unseen requests" },
+        { "date": "2026-10-05", "text": "Shipped v0.5.0: every app you use, one sign-in away" },
+        { "date": "2026-10-04", "text": "Shipped v0.4.0: Gazey drives your Mac" }
+      ]
+    },
+    {
+      "project": "???",
+      "status": "ordered",
+      "progress": 5,
+      "eta": "Soon",
+      "updates": [
+        { "date": "2026-11-14", "text": "Label created. Contents classified." }
+      ]
+    },
+    {
+      "project": "AfterLab",
+      "status": "delivered",
+      "eta": "Mar 2026",
+      "updates": [
+        { "date": "2026-03", "text": "Delivered: 20+ one-click actions for After Effects" },
+        { "date": "2025-12", "text": "Order placed: automate repetitive editing in After Effects" }
+      ]
+    }
+  ]
+}
