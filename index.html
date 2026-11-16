@@ -154,7 +154,6 @@
         /* info-only points: no click, label on hover/focus */
         .hotspot.info { cursor: default; }
         .hotspot:focus-visible .label { opacity: 1; transform: translateX(0); }
-        .label b { font-weight: 600; margin-right: 6px; }
         .label.left { left: auto; right: 24px; transform: translateX(10px); }
         .hotspot:hover .label.left, .hotspot:focus-visible .label.left { transform: translateX(0); }
 
@@ -795,7 +794,7 @@
             <!-- Info only -->
             <a href="#" class="hotspot" id="link-boxes" onclick="openTrackModal(event)">
                 <span class="dot"></span>
-                <span class="label left"><b>Track packages</b><span id="track-label">what I'm building</span></span>
+                <span class="label left">Tracking</span>
             </a>
 
             <!-- Triggers the Terminal Modal (Soon) -->
@@ -1130,7 +1129,6 @@
                 const days = Math.round((Date.now() - new Date(latest + 'T12:00')) / 864e5);
                 document.getElementById('tk-updated').textContent = `Last scan ${days <= 0 ? 'today' : days === 1 ? 'yesterday' : `${days} days ago`}`;
             }
-            document.getElementById('track-label').textContent = `${onWay} on the way`;
         }
 
         async function loadNow() {
