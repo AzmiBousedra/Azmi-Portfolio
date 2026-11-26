@@ -244,6 +244,16 @@
         .tool-btn.primary:hover { background: #2895ff; }
         .bar-sep { width: 1px; height: 22px; background: rgba(255,255,255,.12); }
         .seg-btn:focus-visible, .tool-btn:focus-visible, .mac-light:focus-visible { outline: 2px solid #0a84ff; outline-offset: 1px; }
+        /* EN | FR switch: a thumb that springs between the two halves */
+        .lang-seg { position: relative; }
+        .lang-seg .seg-btn { position: relative; z-index: 1; width: 36px; min-width: 0; padding: 0; font-weight: 600; letter-spacing: .5px; }
+        .lang-seg .seg-btn[aria-pressed="true"] { background: none; box-shadow: none; }
+        .lang-thumb { position: absolute; top: 2px; left: 2px; width: 36px; height: 26px; border-radius: 6px; background: rgba(255,255,255,.22);
+            box-shadow: 0 1px 2px rgba(0,0,0,.35), inset 0 .5px 0 rgba(255,255,255,.2); transition: transform .5s cubic-bezier(.3, 1.5, .5, 1); }
+        .lang-seg[data-lang="fr"] .lang-thumb { transform: translateX(38px); }
+        .mac-name.swap { animation: name-swap .4s cubic-bezier(.2, .9, .3, 1); }
+        @keyframes name-swap { from { opacity: 0; transform: translateY(6px); } }
+        @media (prefers-reduced-motion: reduce) { .lang-thumb { transition-duration: .01s; } .mac-name.swap { animation: none; } }
 
         .pdf-view { flex: 1; align-self: stretch; position: relative; overflow: auto; background: transparent; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.25) transparent; overscroll-behavior: contain; }
         .pdf-view.hand { cursor: grab; }
@@ -871,9 +881,15 @@
                 </div>
                 <div class="mac-doc">
                     <svg viewBox="0 0 22 26" aria-hidden="true"><path fill="#f2f2f7" d="M2 0h13l7 7v17a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2z"/><path fill="#c7c7cc" d="M15 0l7 7h-5a2 2 0 0 1-2-2z"/><rect x="3" y="15" width="16" height="7" rx="1.5" fill="#ff453a"/><text x="11" y="20.6" text-anchor="middle" font-size="5.2" font-weight="700" fill="#fff" font-family="-apple-system, sans-serif">PDF</text></svg>
-                    <div><span class="mac-name">azmi_resume.pdf</span><span class="mac-sub" id="pdf-sub">PDF document</span></div>
+                    <div><span class="mac-name" id="pdf-name">azmi_resume.pdf</span><span class="mac-sub" id="pdf-sub">PDF document</span></div>
                 </div>
                 <div class="mac-tools">
+                    <div class="seg lang-seg" id="lang-seg" data-lang="en" role="group" aria-label="Language">
+                        <span class="lang-thumb" aria-hidden="true"></span>
+                        <button class="seg-btn" data-lang="en" aria-pressed="true" title="English (L)">EN</button>
+                        <button class="seg-btn" data-lang="fr" aria-pressed="false" title="Français (L)">FR</button>
+                    </div>
+                    <span class="bar-sep"></span>
                     <div class="seg seg-tools pdf-only" role="group" aria-label="Tool">
                         <button class="seg-btn" data-tool="hand" aria-pressed="true" title="Hand tool (H)">
                             <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M7.5 1.5a1 1 0 0 1 1 1V7h.5V3a1 1 0 0 1 2 0v4h.5V4.5a1 1 0 0 1 2 0V10a5 5 0 0 1-5 5H8.2a5 5 0 0 1-3.9-1.9L1.7 9.9a1 1 0 0 1 1.5-1.3L4.5 10V4a1 1 0 0 1 2 0v3h.5V2.5a1 1 0 0 1 .5-1z"/></svg>
@@ -891,10 +907,10 @@
                         <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 2h4.5v1.5h-3v3H2zm7.5 0H14v4.5h-1.5v-3h-3zM2 9.5h1.5v3h3V14H2zm10.5 0H14V14H9.5v-1.5h3z"/></svg>
                     </button>
                     <span class="bar-sep"></span>
-                    <a class="tool-btn" href="resume.pdf" target="_blank" rel="noopener" title="Open in a new tab" aria-label="Open in a new tab">
+                    <a class="tool-btn" id="pdf-open" href="resume.pdf" target="_blank" rel="noopener" title="Open in a new tab" aria-label="Open in a new tab">
                         <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M9 2h5v5h-1.5V4.6L7.3 9.8 6.2 8.7l5.2-5.2H9zM3 4h4v1.5H3.5v7h7V9H12v4a.5.5 0 0 1-.5.5h-9A.5.5 0 0 1 2 13V4.5A.5.5 0 0 1 2.5 4z"/></svg>
                     </a>
-                    <a class="tool-btn primary" href="resume.pdf" download="Azmi-Bousedra-Resume.pdf" title="Download">
+                    <a class="tool-btn primary" id="pdf-dl" href="resume.pdf" download="Azmi-Bousedra-Resume.pdf" title="Download">
                         <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M7.25 1.5h1.5v7.2l2.7-2.7 1.06 1.06L8 11.56 3.49 7.06 4.55 6l2.7 2.7zM2 13h12v1.5H2z"/></svg><span>Download</span>
                     </a>
                 </div>
@@ -1274,18 +1290,111 @@
         const resumeWindow = document.getElementById('resume-window');
         const ACTUAL = 96 / 72; // PDF points -> CSS pixels: what "100%" means
 
-        function loadPdf() {
-            pdf.loading ??= (async () => {
-                const lib = await import(PDFJS + 'pdf.min.mjs');
+        const RESUMES = {
+            en: { file: 'resume.pdf', name: 'azmi_resume.pdf', dl: 'Azmi-Bousedra-Resume.pdf', label: 'Résumé' },
+            fr: { file: 'resume_fr.pdf', name: 'azmi_cv_fr.pdf', dl: 'Azmi-Bousedra-CV.pdf', label: 'CV (français)' },
+        };
+        const savedLang = (() => { try { return localStorage.getItem('resume-lang'); } catch { return null; } })();
+        pdf.lang = RESUMES[savedLang] ? savedLang : (/^fr/i.test(navigator.language || '') ? 'fr' : 'en');
+        pdf.docs = {};
+
+        function pdfLib() {
+            pdf.lib ??= import(PDFJS + 'pdf.min.mjs').then(lib => {
                 // a same-origin blob wrapper lets the cross-origin worker start as a real module worker
                 lib.GlobalWorkerOptions.workerSrc = URL.createObjectURL(new Blob([`import "${PDFJS}pdf.worker.min.mjs";`], { type: 'text/javascript' }));
-                const doc = await lib.getDocument('resume.pdf').promise;
-                for (let n = 1; n <= doc.numPages; n++) pdf.pages.push(await doc.getPage(n));
-                pdf.canvases = pdf.pages.map(() => pdfStage.appendChild(document.createElement('canvas')));
-                document.getElementById('pdf-sub').textContent = `${doc.numPages} page${doc.numPages > 1 ? 's' : ''} · PDF`;
-            })();
-            return pdf.loading;
+                return lib;
+            });
+            return pdf.lib;
         }
+
+        // each language's pages load once and are kept, so switching back is instant
+        function getPages(lang) {
+            pdf.docs[lang] ??= (async () => {
+                const doc = await (await pdfLib()).getDocument(RESUMES[lang].file).promise;
+                const pages = [];
+                for (let n = 1; n <= doc.numPages; n++) pages.push(await doc.getPage(n));
+                return pages;
+            })();
+            pdf.docs[lang].catch(() => delete pdf.docs[lang]); // let a failed load retry
+            return pdf.docs[lang];
+        }
+
+        function mountPages(pages) {
+            pdf.tasks.forEach(t => t.cancel());
+            pdf.tasks = [];
+            pdf.pages = pages;
+            pdfStage.replaceChildren();
+            pdf.canvases = pages.map(() => pdfStage.appendChild(document.createElement('canvas')));
+            document.getElementById('pdf-sub').textContent = `${pages.length} page${pages.length > 1 ? 's' : ''} · PDF`;
+        }
+
+        async function loadPdf() {
+            if (pdf.pages.length) return;
+            const pages = await getPages(pdf.lang);
+            if (!pdf.pages.length) mountPages(pages);
+            getPages(pdf.lang === 'en' ? 'fr' : 'en').catch(() => {}); // warm the other language
+        }
+
+        function applyLangUI(lang, animate) {
+            const r = RESUMES[lang];
+            document.getElementById('lang-seg').dataset.lang = lang;
+            document.querySelectorAll('button[data-lang]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lang === lang)));
+            const name = document.getElementById('pdf-name');
+            name.textContent = r.name;
+            if (animate) { name.classList.remove('swap'); void name.offsetWidth; name.classList.add('swap'); }
+            document.getElementById('pdf-open').href = r.file;
+            const dl = document.getElementById('pdf-dl');
+            dl.href = r.file; dl.download = r.dl;
+            resumeWindow.setAttribute('aria-label', r.label);
+            document.getElementById('resume-frame').title = `Azmi Bousedra · ${r.label}`;
+        }
+        applyLangUI(pdf.lang);
+
+        // the page flips over like a sheet of paper to show the other language
+        async function setLang(lang) {
+            if (lang === pdf.lang || pdf.switching) return;
+            const prev = pdf.lang;
+            pdf.lang = lang;
+            applyLangUI(lang, true);
+            try { localStorage.setItem('resume-lang', lang); } catch {}
+            if (resumeWindow.classList.contains('fallback')) {
+                document.getElementById('resume-frame').src = RESUMES[lang].file + '#toolbar=0&navpanes=0&view=Fit';
+                return;
+            }
+            if (!pdf.pages.length) return; // not opened yet: loadPdf picks up pdf.lang
+            pdf.switching = true;
+            const next = getPages(lang);
+            const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const dir = lang === 'fr' ? 1 : -1;
+            const turn = deg => `perspective(1800px) rotateY(${deg}deg)`;
+            try {
+                await Promise.all(pdf.canvases.map(c => c.animate(
+                    calm ? [{ opacity: 1 }, { opacity: 0 }] : [{ transform: turn(0) }, { transform: turn(-90 * dir), filter: 'brightness(.75)' }],
+                    { duration: calm ? 140 : 240, easing: 'cubic-bezier(.55, 0, .85, .35)', fill: 'forwards' }).finished));
+                const pages = await next;
+                mountPages(pages);
+                pdf.canvases.forEach(c => calm ? c.style.opacity = 0 : c.style.transform = turn(90 * dir));
+                renderPages(0);
+                await new Promise(r => setTimeout(r));
+                await Promise.all(pdf.tasks.map(t => t.promise.catch(() => {})));
+                await Promise.all(pdf.canvases.map(c => {
+                    c.style.opacity = c.style.transform = '';
+                    return c.animate(
+                        calm ? [{ opacity: 0 }, { opacity: 1 }] : [{ transform: turn(90 * dir), filter: 'brightness(.75)' }, { transform: turn(0) }],
+                        { duration: calm ? 160 : 520, easing: 'cubic-bezier(.2, 1.25, .4, 1)' }).finished;
+                }));
+            } catch (err) {
+                // couldn't load that language: put the previous one back
+                console.error(err);
+                pdf.lang = prev;
+                applyLangUI(prev);
+                mountPages(await getPages(prev));
+                renderPages(0);
+            } finally {
+                pdf.switching = false;
+            }
+        }
+        document.querySelectorAll('button[data-lang]').forEach(b => b.onclick = () => setLang(b.dataset.lang));
 
         function fitScale() {
             const vp = pdf.pages[0].getViewport({ scale: 1 });
@@ -1302,7 +1411,7 @@
         }
 
         // CSS-size the pages right away (instant zoom), then re-render them crisp once zooming settles
-        function renderPages() {
+        function renderPages(delay = 90) {
             sizeCanvases();
             clearTimeout(pdf.renderTimer);
             pdf.renderTimer = setTimeout(() => {
@@ -1316,7 +1425,7 @@
                     task.promise.catch(() => {}); // cancelled by a newer zoom
                     return task;
                 });
-            }, 90);
+            }, delay);
         }
 
         // zoom so the point under (cx, cy) in the viewer stays put
@@ -1356,7 +1465,7 @@
                 resumeWindow.classList.add('fallback');
                 const frame = document.getElementById('resume-frame');
                 document.getElementById('pdf-fallback').hidden = false;
-                if (!frame.getAttribute('src')) frame.src = 'resume.pdf#toolbar=0&navpanes=0&view=Fit';
+                if (!frame.getAttribute('src')) frame.src = RESUMES[pdf.lang].file + '#toolbar=0&navpanes=0&view=Fit';
             }
         }
 
@@ -1415,7 +1524,9 @@
         ['keydown', 'keyup'].forEach(t => document.addEventListener(t, (e) => { if (e.key === 'Alt') pdfView.classList.toggle('out', t === 'keydown'); }));
         // shortcuts while the resume is open
         document.addEventListener('keydown', (e) => {
-            if (!document.getElementById('resume-modal').classList.contains('open') || e.metaKey || e.ctrlKey || !pdf.pages.length) return;
+            if (!document.getElementById('resume-modal').classList.contains('open') || e.metaKey || e.ctrlKey) return;
+            if (e.key === 'l' || e.key === 'L') return setLang(pdf.lang === 'en' ? 'fr' : 'en');
+            if (!pdf.pages.length) return;
             if (e.key === '+' || e.key === '=') setScale(pdf.scale * 1.25);
             else if (e.key === '-') setScale(pdf.scale / 1.25);
             else if (e.key === '0') fitPage();
